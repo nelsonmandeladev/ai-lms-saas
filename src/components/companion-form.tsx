@@ -23,6 +23,9 @@ import {
 import {subjects} from "@/constants";
 import {Textarea} from "@/components/ui/textarea";
 import {redirect} from "next/navigation";
+import {createCompanionAction} from "@/lib/actions/companion.actions";
+import {useTransition} from "react";
+import {Loader2} from "lucide-react";
 
 const formSchema = z.object({
     name: z.string().min(1, { message: 'Companion is required.'}),
@@ -36,6 +39,8 @@ const formSchema = z.object({
 export type FormType = z.infer<typeof formSchema>;
 
 export function CompanionForm () {
+    const [isPending, startTransition] = useTransition();
+
     const form = useForm<FormType>({
         resolver: zodResolver(formSchema),
         defaultValues: {
@@ -48,15 +53,17 @@ export function CompanionForm () {
         }, // ✅ ensures matching types ,
     })
 
-    const onSubmit = async (values: FormType) => {
-        // const companion = await createCompanion(values);
+    function onSubmit(values: FormType) {
+        startTransition(async () => {
+            const companion = await createCompanionAction(values);
 
-        // if(companion) {
-        //     redirect(`/companions/${companion.id}`);
-        // } else {
-        //     console.log('Failed to create a companion');
-        //     redirect('/');
-        // }
+            if(companion) {
+                redirect(`/companions/${companion.id}`);
+            } else {
+                console.log('Failed to create a companion');
+                redirect('/');
+            }
+        });
     }
 
     return (
@@ -210,7 +217,16 @@ export function CompanionForm () {
                         </FormItem>
                     )}
                 />
-                <Button type="submit" className="w-full cursor-pointer">Build Your Companion</Button>
+                <Button
+                    disabled={isPending}
+                    type="submit"
+                    className="w-full cursor-pointer"
+                >
+                    {isPending && (
+                        <Loader2 className={"transition-all duration-300 animate-spin"} />
+                    )}
+                    Build Your Companion
+                </Button>
             </form>
         </Form>
     )
