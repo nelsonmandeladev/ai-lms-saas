@@ -33,7 +33,7 @@ const formSchema = z.object({
     topic: z.string().min(1, { message: 'Topic is required.'}),
     voice: z.string().min(1, { message: 'Voice is required.'}),
     style: z.string().min(1, { message: 'Style is required.'}),
-    duration: z.number().min(1, { message: 'Duration is required.'}),
+    duration: z.string().min(1, { message: 'Duration is required.'}),
 });
 
 export type FormType = z.infer<typeof formSchema>;
@@ -49,13 +49,16 @@ export function CompanionForm () {
             topic: '',
             voice: '',
             style: '',
-            duration: 15,
+            duration: "15",
         }, // ✅ ensures matching types ,
     })
 
     function onSubmit(values: FormType) {
         startTransition(async () => {
-            const companion = await createCompanionAction(values);
+            const companion = await createCompanionAction({
+                ...values,
+                duration: Number(values.duration),
+            });
 
             if(companion) {
                 redirect(`/companions/${companion.id}`);

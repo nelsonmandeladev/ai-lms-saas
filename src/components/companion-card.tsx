@@ -6,9 +6,10 @@ import { usePathname } from "next/navigation";
 
 interface CompanionCardProps {
     companion: Companion;
+    color?: string;
 }
 
-export function CompanionCard({ companion}:CompanionCardProps){
+export function CompanionCard({ companion, color: cColor}:CompanionCardProps){
     const {
         id,
         name,
@@ -27,7 +28,7 @@ export function CompanionCard({ companion}:CompanionCardProps){
         }
     };
     return (
-        <article className="companion-card" style={{ backgroundColor: color }}>
+        <article className="companion-card" style={{ backgroundColor: color ?? cColor }}>
             <div className="flex justify-between items-center">
                 <div className="subject-badge">{subject}</div>
                 <button className="companion-bookmark" onClick={handleBookmark}>
