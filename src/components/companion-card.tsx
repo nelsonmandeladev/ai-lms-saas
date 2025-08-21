@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import {addBookmark, removeBookmark} from "@/lib/actions/companion.actions";
 
 interface CompanionCardProps {
     companion: Companion;
@@ -22,9 +23,9 @@ export function CompanionCard({ companion, color: cColor}:CompanionCardProps){
     const pathname = usePathname();
     const handleBookmark = async () => {
         if (bookmarked) {
-            // await removeBookmark(id, pathname);
+            await removeBookmark(id, pathname);
         } else {
-            // await addBookmark(id, pathname);
+            await addBookmark(id, pathname);
         }
     };
     return (

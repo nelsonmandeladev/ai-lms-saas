@@ -6,6 +6,7 @@ import {vapi} from "@/lib/vapi.sdk";
 import Image from "next/image";
 import Lottie, {LottieRefCurrentProps} from "lottie-react";
 import soundwaves from '@/constants/soundwaves.json'
+import {addToSessionHistory} from "@/lib/actions/companion.actions";
 
 enum CallStatus {
     INACTIVE = 'INACTIVE',
@@ -35,9 +36,9 @@ export function CompanionComponent({ companionId, subject, topic, name, userName
     useEffect(() => {
         const onCallStart = () => setCallStatus(CallStatus.ACTIVE);
 
-        const onCallEnd = () => {
+        const onCallEnd = async () => {
             setCallStatus(CallStatus.FINISHED);
-            // addToSessionHistory(companionId)
+           await addToSessionHistory(companionId)
         }
 
         const onMessage = (message: Message) => {
@@ -67,7 +68,7 @@ export function CompanionComponent({ companionId, subject, topic, name, userName
             vapi.off('speech-start', onSpeechStart);
             vapi.off('speech-end', onSpeechEnd);
         }
-    }, []);
+    }, [companionId]);
 
     const toggleMicrophone = () => {
         const isMuted = vapi.isMuted();
@@ -95,7 +96,7 @@ export function CompanionComponent({ companionId, subject, topic, name, userName
     }
 
     return (
-        <section className="grid grid-cols-1 grid-cols-[30%_70%] h-full gap-20">
+        <section className="grid grid-cols-1 grid-cols-[30%_1fr] gap-20 h-full">
             <section className="flex flex-col gap-8 max-sm:flex-col">
                 <div className="companion-section">
                     <div className="companion-avatar" style={{ backgroundColor: getSubjectColor(subject)}}>
@@ -105,7 +106,7 @@ export function CompanionComponent({ companionId, subject, topic, name, userName
                                     'absolute transition-opacity duration-1000', callStatus === CallStatus.FINISHED || callStatus === CallStatus.INACTIVE ? 'opacity-1001' : 'opacity-0', callStatus === CallStatus.CONNECTING && 'opacity-100 animate-pulse'
                                 )
                             }>
-                            <Image src={`/icons/${subject}.svg`} alt={subject} width={70} height={70} className="max-sm:w-fit" />
+                            <Image src={`/icons/${subject}.svg`} alt={subject} width={50} height={50} className="max-sm:w-fit" />
                         </div>
 
                         <div className={cn('absolute transition-opacity duration-1000', callStatus === CallStatus.ACTIVE ? 'opacity-100': 'opacity-0')}>
@@ -122,7 +123,7 @@ export function CompanionComponent({ companionId, subject, topic, name, userName
 
                 <div className="user-section">
                     <div className="user-avatar">
-                        <Image src={userImage} alt={userName} width={130} height={130} className="rounded-lg" />
+                        <Image src={userImage} alt={userName} width={110} height={110} className="rounded-lg" />
                         <p className="font-bold text-2xl">
                             {userName}
                         </p>
@@ -177,7 +178,6 @@ export function CompanionComponent({ companionId, subject, topic, name, userName
                         );
                     })}
                 </div>
-
                 <div className="transcript-fade" />
             </section>
         </section>
